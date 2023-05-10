@@ -8,9 +8,14 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 /**
  * this handler is webSocket server side, it just like the mvc controller,
- * so this handler should be registered into the spring context.
- * The {@link TextWebSocketHandler} extends form {@link AbstractWebSocketHandler}
- *
+ * so this handler dont need any client's stuff (I comment on below)
+ * <p>
+ * The {@link TextWebSocketHandler} extends form {@link AbstractWebSocketHandler}, that is mean
+ * the Handler can handle text message.
+ * Just like a RESTful api can handler request (but the request is socket event and message).
+ * <p>
+ * if you want to the handler work in spring boot context you can follow this doc:
+ * https://docs.spring.io/spring-framework/docs/6.0.8/reference/html/web.html#websocket-server
  */
 @Slf4j
 public class NostrWebSocketHandler extends TextWebSocketHandler {
