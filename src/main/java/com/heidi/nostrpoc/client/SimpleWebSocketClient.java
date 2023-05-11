@@ -2,7 +2,9 @@ package com.heidi.nostrpoc.client;
 
 import jakarta.websocket.*;
 import java.net.URI;
+import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  * Follow this sample
@@ -56,7 +58,8 @@ public class SimpleWebSocketClient {
     }
   }
 
-  public String syncSendMessage(String msg) {
+  @Async
+  public CompletableFuture<String> syncSendMessage(String msg) {
     try {
       long startTime = System.currentTimeMillis();
       lock = new Object();
@@ -67,7 +70,7 @@ public class SimpleWebSocketClient {
 
       log.info("estimatedTime: {}", System.currentTimeMillis() - startTime);
 
-      return response;
+      return CompletableFuture.completedFuture(response);
     } catch (Exception e) {
       e.printStackTrace();
     }

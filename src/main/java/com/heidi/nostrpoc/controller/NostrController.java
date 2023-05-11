@@ -4,17 +4,19 @@ import static java.time.ZoneOffset.UTC;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.heidi.nostrpoc.client.NostrWebSocketClient;
-import com.heidi.nostrpoc.client.NostrWebSocketHandler;
 import com.heidi.nostrpoc.client.SimpleWebSocketClient;
 import com.heidi.nostrpoc.constant.NostrEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * so this class we dont need the NostrWebSocketHandler,
  * we just need injection the NostrWebSocketClient help me send the websocket message.
  */
+@EnableAsync
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -45,8 +48,11 @@ public class NostrController {
 
 
     // you can design the API to send Nostr event by
+    // should make this API is async, because the websocket will keep the connection never close.
+    @Async
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
     @GetMapping("/nostr/hello")
-    public String sayHello() throws JsonProcessingException {
+    public CompletableFuture<String> sayHello() throws JsonProcessingException {
 //        client.createSession();
 //        handler.sendNostrEvent(client.getSession());
 
@@ -68,7 +74,10 @@ public class NostrController {
 
         simpleWebSocketClient.syncSendMessage(json);
 
-        // we dont need close, because it will handle another request the send the Nostr event.
-        return "Hello Nostr!";
+        // we dont need close the simpleWebSocketClient,
+        // because it will handle another request to send the Nostr event.
+        // and this completableFuture be never complete,
+        // so you can consider response Http 202 to tell client the request is accepted.
+        return CompletableFuture.completedFuture("Hello Nostr!");
     }
 }
