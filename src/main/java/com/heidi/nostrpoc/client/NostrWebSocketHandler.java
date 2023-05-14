@@ -1,10 +1,19 @@
 package com.heidi.nostrpoc.client;
 
+import com.heidi.nostrpoc.constant.client.ClientEventType;
+import com.heidi.nostrpoc.constant.server.ServerEventType;
+import com.heidi.nostrpoc.util.NostrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * this handler is webSocket server side, it just like the mvc controller,
@@ -19,6 +28,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
  */
 @Slf4j
 public class NostrWebSocketHandler extends TextWebSocketHandler {
+    private final static HashMap<String, WebSocketSession> requestedClient = new HashMap<>();
 
     // because this class is server side, so we dont need this fields.
     // private static final String PUBLIC_KEY = "e0131db0689078f518710ad970a2b37f7e1af28769238a447cf95455df72eb4a";
@@ -33,7 +43,25 @@ public class NostrWebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
-        log.info("Connection established");
+        log.info("Connection established" + session.getRemoteAddress());
+    }
+
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        log.info("Received message: " + message.getPayload() + session.getRemoteAddress() + session.getHandshakeHeaders());
+        List<String> list  = NostrUtils.deserializeEvent(message.getPayload());
+        ClientEventType clientEventType = ClientEventType.valueOf(list.get(0));
+        if(clientEventType == ClientEventType.REQ){
+            requestedClient.put(list.get(1), session);
+            log.info("user subscribe with id: " + list.get(1));
+        } else if (clientEventType == ClientEventType.EVENT){
+            for (Map.Entry<String, WebSocketSession> client : requestedClient.entrySet()){
+                WebSocketSession clientSession = client.getValue();
+                if(clientSession != null){
+                    clientSession.sendMessage(message);
+                }
+            }
+        }
     }
 
     @Override
@@ -41,27 +69,5 @@ public class NostrWebSocketHandler extends TextWebSocketHandler {
         log.info("WebSocket session closed with status: " + status);
     }
 
-    // and also dont need this methods
-//    public void sendNostrEvent(WebSocketSession session) throws JsonProcessingException {
-//        NostrEvent event = new NostrEvent();
-//        event.setKind(1);
-//        event.setPubkey(PUBLIC_KEY);
-//        event.setCreatedAt(LocalDateTime.now().toEpochSecond(UTC));
-//        event.setTags(List.of("test"));
-//        event.setContent("Hello from Heidi");
-//        event.setId(event.generateId());
-//        event.setSig(PUBLIC_KEY + PRIVATE_KEY);
-//
-//        List<IEvent> list = new ArrayList<>();
-//        list.add(EventType.EVENT);
-//        list.add(event);
-//        try {
-//            String payload = NostrUtils.serializeEvent(list);
-//            log.info("nostr client send payload: {}", payload);
-//            session.sendMessage(new TextMessage(payload));
-//        } catch (Exception e) {
-//            log.info("Error sending Nostr event: " + e.getMessage());
-//        }
-//    }
 
 }

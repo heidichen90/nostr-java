@@ -5,15 +5,16 @@ import static java.time.ZoneOffset.UTC;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.heidi.nostrpoc.client.SimpleWebSocketClient;
-import com.heidi.nostrpoc.constant.NostrEvent;
+import com.heidi.nostrpoc.constant.client.ClientEventType;
+import com.heidi.nostrpoc.constant.client.NostrEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+
+import com.heidi.nostrpoc.util.NostrUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -46,38 +47,30 @@ public class NostrController {
 
     private final ObjectMapper objectMapper;
 
+    @GetMapping("/nostr/connect")
+    public String connect() {
+        simpleWebSocketClient.connect("ws://localhost:8081/myHandler");
+        return "connect success";
+    }
 
-    // you can design the API to send Nostr event by
-    // should make this API is async, because the websocket will keep the connection never close.
-    @Async
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     @GetMapping("/nostr/hello")
-    public CompletableFuture<String> sayHello() throws JsonProcessingException {
-//        client.createSession();
-//        handler.sendNostrEvent(client.getSession());
+    public String sayHello() throws JsonProcessingException {
 
-        // I think Record will be easier
-        NostrEvent event = new NostrEvent();
-        event.setKind(1);
-        event.setPubkey(PUBLIC_KEY);
-        event.setCreatedAt(LocalDateTime.now().toEpochSecond(UTC));
-        event.setTags(List.of("test"));
-        event.setContent("Hello from Heidi");
-        event.setId(event.generateId());
-        event.setSig(null);
+        NostrEvent event = NostrEvent.builder()
+            .kind(1)
+            .pubkey(PUBLIC_KEY)
+            .createdAt(LocalDateTime.now().toEpochSecond(UTC))
+            .tags(List.of("test"))
+            .content("Hello from Heidi")
+            .id(null)
+            .sig(null)
+            .build();
 
         List<Object> list = new ArrayList<>();
-        list.add("EVENT");
+        list.add(ClientEventType.EVENT);
         list.add(event);
-
-        final String json = objectMapper.writeValueAsString(list);
-
-        simpleWebSocketClient.syncSendMessage(json);
-
-        // we dont need close the simpleWebSocketClient,
-        // because it will handle another request to send the Nostr event.
-        // and this completableFuture be never complete,
-        // so you can consider response Http 202 to tell client the request is accepted.
-        return CompletableFuture.completedFuture("Hello Nostr!");
+        simpleWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
+        return "send Nostr event success";
     }
 }

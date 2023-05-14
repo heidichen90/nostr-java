@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 /**
  * Follow this sample
@@ -23,6 +24,11 @@ public class SimpleWebSocketClient {
 
   public SimpleWebSocketClient() {
     container = ContainerProvider.getWebSocketContainer();
+  }
+
+  @OnError
+  public void onError(Session session, Throwable error) {
+    log.info("ws-client socket on error, session id: {}. {}", session.getId(), error.getMessage());
   }
 
   @OnOpen
