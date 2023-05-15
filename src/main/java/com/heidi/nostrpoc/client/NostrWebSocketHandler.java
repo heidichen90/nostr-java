@@ -2,7 +2,9 @@ package com.heidi.nostrpoc.client;
 
 import com.heidi.nostrpoc.constant.client.ClientEventType;
 import com.heidi.nostrpoc.constant.server.ServerEventType;
+import com.heidi.nostrpoc.service.EventService;
 import com.heidi.nostrpoc.util.NostrUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -27,7 +29,9 @@ import java.util.Map;
  * https://docs.spring.io/spring-framework/docs/6.0.8/reference/html/web.html#websocket-server
  */
 @Slf4j
+@RequiredArgsConstructor
 public class NostrWebSocketHandler extends TextWebSocketHandler {
+    private final EventService eventService;
     private final static HashMap<String, WebSocketSession> requestedClient = new HashMap<>();
 
     // because this class is server side, so we dont need this fields.
@@ -51,10 +55,14 @@ public class NostrWebSocketHandler extends TextWebSocketHandler {
         log.info("Received message: " + message.getPayload() + session.getRemoteAddress() + session.getHandshakeHeaders());
         List<String> list  = NostrUtils.deserializeEvent(message.getPayload());
         ClientEventType clientEventType = ClientEventType.valueOf(list.get(0));
+        //save event
+        eventService.asyncInsertEvent(message.getPayload());
         if(clientEventType == ClientEventType.REQ){
             requestedClient.put(list.get(1), session);
             log.info("user subscribe with id: " + list.get(1));
         } else if (clientEventType == ClientEventType.EVENT){
+            //validate id and sig
+            //broadcast the message to all client
             for (Map.Entry<String, WebSocketSession> client : requestedClient.entrySet()){
                 WebSocketSession clientSession = client.getValue();
                 if(clientSession != null){

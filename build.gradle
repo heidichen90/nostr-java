@@ -20,7 +20,9 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'mysql:mysql-connector-java:8.0.32'
     compileOnly 'org.projectlombok:lombok:1.18.22'
     annotationProcessor 'org.projectlombok:lombok:1.18.22'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
