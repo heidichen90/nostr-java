@@ -32,5 +32,5 @@ I will use Multi-Primary strategy which been natively supported on MySQL. As its
 
 - Pending task
 
-[] validate signature
-[] validate id
+- [] validate signature
+- [] validate id
