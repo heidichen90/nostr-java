@@ -22,7 +22,7 @@ public class NostrPocApplication {
         executor.setCorePoolSize(2);
         executor.setMaxPoolSize(4);
         executor.setQueueCapacity(500);
-        executor.setThreadNamePrefix("GithubLookup-");
+        executor.setThreadNamePrefix("NostrPoc-");
         executor.initialize();
         return executor;
     }
