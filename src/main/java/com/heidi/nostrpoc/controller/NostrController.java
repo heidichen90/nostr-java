@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.heidi.nostrpoc.constant.client.Request;
 import com.heidi.nostrpoc.util.NostrUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,4 +74,16 @@ public class NostrController {
         simpleWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
         return "send Nostr event success";
     }
+
+//    @ResponseStatus(code = HttpStatus.ACCEPTED)
+//    @GetMapping("/nostr/aggregation")
+//    public String aggregate() throws JsonProcessingException {
+//        List<Object> list = new ArrayList<>();
+//        list.add(ClientEventType.REQ);
+//        list.add("12j312n31knkajsndaksndas");
+//        Request request = Request.builder().limit(5).build();
+//        list.add(request);
+//        simpleWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
+//        return "send aggregation request success";
+//    }
 }

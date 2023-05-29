@@ -3,6 +3,8 @@ package com.heidi.nostrpoc.client;
 import jakarta.websocket.*;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -13,9 +15,10 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @ClientEndpoint
+@RequiredArgsConstructor
 public class SimpleWebSocketClient {
 
-  private WebSocketContainer container;
+  private final WebSocketContainer container;
   private Session userSession;
 
   private Object lock;
@@ -44,6 +47,7 @@ public class SimpleWebSocketClient {
   @OnMessage
   public void onMessage(Session session, String msg) {
     try {
+      log.info("ws-client socket on message, session id: {}, msg: {}", session.getId(), msg);
       response = msg;
 
       // i not really understand the lock just follow the example
@@ -58,7 +62,6 @@ public class SimpleWebSocketClient {
   public void connect(String serverUri) {
     try {
       userSession = container.connectToServer(this, new URI(serverUri));
-      userSession.setMaxTextMessageBufferSize(Integer.MAX_VALUE);
     } catch (Exception e) {
       e.printStackTrace();
     }
