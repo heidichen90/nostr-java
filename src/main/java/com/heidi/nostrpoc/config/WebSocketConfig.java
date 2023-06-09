@@ -11,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -28,6 +29,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
 
   private final NostrWebSocketHandler myNostrWebSocketHandler;
+  private final KafkaTemplate kafkaTemplate;
 
   @Bean
   public WebSocketContainer webSocketContainer() {
@@ -53,7 +55,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
   @Bean
   public AggWebSocketClient aggWebSocketClient() throws JsonProcessingException {
     //do not estabilish connection when application set up. It will be estabilished when needed. otherwise it will cause conflict.
-    final AggWebSocketClient aggWebSocketClient = new AggWebSocketClient();
+    final AggWebSocketClient aggWebSocketClient = new AggWebSocketClient(webSocketContainer(), kafkaTemplate);
     aggWebSocketClient.connect("wss://relay.nekolicio.us");
 
 //    List<Object> list = new ArrayList<>();

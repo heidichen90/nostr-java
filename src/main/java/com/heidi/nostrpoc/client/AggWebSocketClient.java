@@ -3,7 +3,6 @@ package com.heidi.nostrpoc.client;
 import jakarta.websocket.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 
@@ -16,9 +15,7 @@ import java.util.concurrent.CompletableFuture;
 public class AggWebSocketClient {
 
     private final WebSocketContainer container;
-
-    @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     private Session userSession;
 
@@ -26,9 +23,11 @@ public class AggWebSocketClient {
 
     private String response;
 
-    public AggWebSocketClient() {
-        container = ContainerProvider.getWebSocketContainer();
-    }
+
+//    public AggWebSocketClient(KafkaTemplate<String, String> kafkaTemplate) {
+//        this.kafkaTemplate = kafkaTemplate;
+//        container = ContainerProvider.getWebSocketContainer();
+//    }
 
 
     @OnError

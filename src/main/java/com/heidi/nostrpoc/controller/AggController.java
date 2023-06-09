@@ -33,7 +33,6 @@ public class AggController {
     @GetMapping("/agg/connect")
     public String connect() {
         aggWebSocketClient.connect("wss://relay.nekolicio.us");
-        aggWebSocketClient.connect();
         return "connect success";
     }
 

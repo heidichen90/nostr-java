@@ -15,10 +15,9 @@ import org.springframework.stereotype.Component;
  */
 @Slf4j
 @ClientEndpoint
-@RequiredArgsConstructor
 public class SimpleWebSocketClient {
 
-  private final WebSocketContainer container;
+  private WebSocketContainer container;
   private Session userSession;
 
   private Object lock;
