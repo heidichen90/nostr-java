@@ -6,12 +6,14 @@ import com.heidi.nostrpoc.client.AggWebSocketClient;
 import com.heidi.nostrpoc.client.SimpleWebSocketClient;
 import com.heidi.nostrpoc.constant.client.ClientEventType;
 import com.heidi.nostrpoc.constant.client.Request;
+import com.heidi.nostrpoc.constant.dto.SubscribeRequest;
 import com.heidi.nostrpoc.util.NostrUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +39,7 @@ public class AggController {
     }
 
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    @GetMapping("/agg/subscribe")
+    @GetMapping("/agg/subscribe/first")
     public String subscribe() throws JsonProcessingException {
         List<Object> list = new ArrayList<>();
         list.add(ClientEventType.REQ);
@@ -46,6 +48,19 @@ public class AggController {
         list.add(request);
         aggWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
         return "send aggregation request success";
+    }
+
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    @GetMapping("/agg/connectAndSubscribe")
+    public String subscribe(@RequestBody SubscribeRequest subscribeRequest) throws JsonProcessingException {
+        aggWebSocketClient.connect(subscribeRequest.nostrServer());
+        List<Object> list = new ArrayList<>();
+        list.add(ClientEventType.REQ);
+        list.add("12j312n31knkajsndaksndas");
+        Request request = Request.builder().limit(5).build();
+        list.add(request);
+        aggWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
+        return "subscribe to: " + subscribeRequest.nostrServer() + " success";
     }
 
 }

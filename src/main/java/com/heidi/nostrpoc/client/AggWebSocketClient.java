@@ -23,13 +23,6 @@ public class AggWebSocketClient {
 
     private String response;
 
-
-//    public AggWebSocketClient(KafkaTemplate<String, String> kafkaTemplate) {
-//        this.kafkaTemplate = kafkaTemplate;
-//        container = ContainerProvider.getWebSocketContainer();
-//    }
-
-
     @OnError
     public void onError(Session session, Throwable error) {
         log.info("ws-client socket on error, session id: {}. {}", session.getId(), error.getMessage());
