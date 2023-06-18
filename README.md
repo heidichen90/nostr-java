@@ -13,9 +13,9 @@ Project detail: [DISTRISE](https://achq.notion.site/Distributed-Systems-Project-
 build a basic nostr client that can connect to a nostr relay to send a simple message.
 
 ### Deliverable
-- after spin up application need to call `http://localhost:3000/nostr/connect` to subscribe to relay
-- after subscribe to relay, need to call `http://localhost:3000/nostr/hello` to send message to relay
-- check on https://relay.nekolicio.us/, to make sure message been sent
+- after spin up application need to call `http://localhost:8081/nostr/connect` to subscribe to relay
+- after subscribe to relay, need to call `http://localhost:8081/nostr/hello` to send message to relay
+- check on `http://localhost:8081/eventWatcher.html`, to make sure message been sent
 
 ![img.png](image/img.png)
 
@@ -42,11 +42,11 @@ build nostr relay server for DISTRISE. Relays must accept events from clients an
 
 ### Deliverable
 - I have created a nostr relay endpoint on `ws://localhost:8081/myHandler`
-- spin up application and bring up the UI on `http://localhost:3000/index.html`. This page is showing all of the event sent to /myHandler
+- spin up application and bring up the UI on `http://localhost:8081/myHandlerWatcher.html`. This page is showing all of the event sent to /myHandler
 - In NostrController file, cahange the connection destination to `ws://localhost:8081/myHandler` and run the application
-- after spin up application need to call `http://localhost:3000/nostr/connect` to subscribe to relay
-- after subscribe to relay, need to call `http://localhost:3000/nostr/hello` to send message to relay
-- check on http://localhost:3000/index.html`, to make sure message been sent
+- after spin up application need to call `http://localhost:8081/nostr/connect` to subscribe to relay
+- after subscribe to relay, need to call `http://localhost:8081/nostr/hello` to send message to relay
+- check on `http://localhost:8081/myHandlerWatcher.html`, to make sure message been sent
 
 
 ### Questions
@@ -64,8 +64,8 @@ I will use Multi-Primary strategy which been natively supported on MySQL. As its
 build a Event Aggregator and fetch events from a sinfle relat and store them in your database of choice
 
 ### Deliverable
-- After spin up application, call `http://localhost:3000/nostr/agg/connect` to allow event aggregator to connect to relay: wss://relay.nekolicio.us
-- After connect to the relat, call `http://localhost:3000/nostr/agg/subscribe` to subscribe message coming from that relay
+- After spin up application, call `http://localhost:8081/nostr/agg/connect` to allow event aggregator to connect to relay: wss://relay.nekolicio.us
+- After connect to the relat, call `http://localhost:8081/nostr/agg/subscribe` to subscribe message coming from that relay
 - Once received message from relay, it will be stored in MySQL database
 
 ![img_1.png](image/img_1.png)
@@ -89,9 +89,9 @@ Make event aggregator to fetch events from multiple relays,  push them into a Qu
 - To make sure this works, need to have a Kafka server running on local machine (will try to run it on docker compose later)
 - I have created a KafkaProducer to send message to Kafka topic
 - I have created a KafkaConsumer to consume message from Kafka topic and store it in MySQL database
-- After subscribe to relay on Phase 3, call `http://localhost:3000/nostr/agg/getAggData` to get the latest 10 data from database
+- After subscribe to relay on Phase 3, call `http://localhost:8081/nostr/agg/getAggData` to get the latest 10 data from database
 
-[need to add a screenshot here]
+![img.png](image/img_12.png)
 
 ### Questions
 - Why did you choose this solution?
