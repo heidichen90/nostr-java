@@ -7,10 +7,14 @@ import com.heidi.nostrpoc.client.SimpleWebSocketClient;
 import com.heidi.nostrpoc.constant.client.ClientEventType;
 import com.heidi.nostrpoc.constant.client.Request;
 import com.heidi.nostrpoc.constant.dto.SubscribeRequest;
+import com.heidi.nostrpoc.model.EventData;
+import com.heidi.nostrpoc.service.EventService;
 import com.heidi.nostrpoc.util.NostrUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,14 +36,16 @@ public class AggController {
 
     private final ObjectMapper objectMapper;
 
+    private final EventService eventService;
+
     @GetMapping("/agg/connect")
     public String connect() {
         aggWebSocketClient.connect("wss://relay.nekolicio.us");
         return "connect success";
     }
 
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
-    @GetMapping("/agg/subscribe/first")
+    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping("/agg/subscribe")
     public String subscribe() throws JsonProcessingException {
         List<Object> list = new ArrayList<>();
         list.add(ClientEventType.REQ);
@@ -61,6 +67,12 @@ public class AggController {
         list.add(request);
         aggWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
         return "subscribe to: " + subscribeRequest.nostrServer() + " success";
+    }
+
+    @GetMapping("/agg/getAggData")
+    public ResponseEntity<Object> getAggData() {
+        List<EventData> events = eventService.getEvents();
+        return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
 }

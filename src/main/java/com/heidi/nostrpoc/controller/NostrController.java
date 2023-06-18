@@ -40,10 +40,6 @@ public class NostrController {
 
     private static final String PUBLIC_KEY = "e0131db0689078f518710ad970a2b37f7e1af28769238a447cf95455df72eb4a";
 
-//    private NostrWebSocketHandler handler = new NostrWebSocketHandler();
-
-//    private NostrWebSocketClient client = new NostrWebSocketClient(handler);
-
     private final SimpleWebSocketClient simpleWebSocketClient;
 
     private final ObjectMapper objectMapper;
@@ -75,15 +71,4 @@ public class NostrController {
         return "send Nostr event success";
     }
 
-//    @ResponseStatus(code = HttpStatus.ACCEPTED)
-//    @GetMapping("/nostr/aggregation")
-//    public String aggregate() throws JsonProcessingException {
-//        List<Object> list = new ArrayList<>();
-//        list.add(ClientEventType.REQ);
-//        list.add("12j312n31knkajsndaksndas");
-//        Request request = Request.builder().limit(5).build();
-//        list.add(request);
-//        simpleWebSocketClient.syncSendMessage(NostrUtils.serializeEvent(list));
-//        return "send aggregation request success";
-//    }
 }
